@@ -1,0 +1,32 @@
+service: sls-stepfunctions-plugin-test
+
+provider:
+  name: aws
+  runtime: nodejs8.10
+  region: us-east-1
+
+custom:
+  accountId: 1111111111
+
+functions:
+  hello:
+    handler: handler.hello
+
+stepFunctions:
+  stateMachines:
+    hellostepfunc1:
+      events:
+        - http:
+            path: gofunction
+            method: GET
+      definition:
+        Comment: "A Hello World example of the Amazon States Language using an AWS Lambda Function"
+        StartAt: HelloWorld1
+        States:
+          HelloWorld1:
+            Type: Task
+            Resource: arn:aws:lambda:${self:provider.region}:${self:custom.accountId}:function:${self:service}-${opt:stage}-hello
+            End: true
+
+plugins:
+  - serverless-step-functions
